@@ -1,0 +1,6 @@
+#include "lynx.dtsi"
+
+&default_transform {
+	col-offset = <17>;
+};
+

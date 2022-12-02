@@ -1,0 +1,205 @@
+// vim: set ts=4 sw=4:
+
+// TODO: go over this code one more time, I'm pretty sure its not correct
+// TODO: take advantage of conditional_layers, specially to access SETTINGS layer
+
+/*
+ * REFERENCE: 
+ * List of behaviors
+ *     &kp  : key-press
+ *     &mt  : mode-tap
+ *     &mo  : momentary layer
+ *     &lt  : layer-tap
+ *     &sk  : sticky key
+ *     &tog : toogle layer
+ */
+
+#include <behaviors.dtsi>
+#include <dt-bindings/zmk/bt.h>
+#include <dt-bindings/zmk/keys.h>
+#include <dt-bindings/zmk/outputs.h>
+
+// Layer definitions
+#define BASE 0
+#define SYM 1
+#define EXT 2
+#define FNC 3
+#define SYM2 4
+#define SETTINGS 5
+// -----------------
+
+// Global sticky key config
+&sk {
+    // don't release mods on other mods presses
+    ignore-modifiers;
+};
+
+/ {
+    // Creating macros
+    macros {
+        // sometimes my device thinks a modifier is being held down
+        // pressing all modifiers fixes it.
+        unstick: unstick {
+            label = "ZM_unstick";
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            bindings = <&kp LSHIFT &kp RSHIFT &kp LCTRL &kp RCTRL &kp LALT &kp RALT &kp LGUI &kp RGUI>;
+        };
+    };
+
+    // NOTE: combine multiple keypresses to output a different key. They processed 
+    // before then normal keymap node.
+    combos {
+        compatible = "zmk,combos";
+        // momentary to SYM2 layer
+        combo_sym2 {
+            timeout-ms = <200>;
+            // internal-left & external-right thumb keys
+            key-positions = <31 33>;
+            bindings = <&mo SYM2>;
+        };
+        // momentary to SETTINGS layer
+        combo_settings {
+            timeou-ms = <200>;
+            // both left thumb keys
+            key-positions = <30 31>;
+            bindings = <&mo SETTINGS>;
+        };
+    };
+
+    keymap {
+        compatible = "zmk,keymap";
+
+        // -------------------------------------- Layer 0 Starts -----------------------------------------------------------------
+        // Default alphabetical layer
+        default_layer {
+            label = "Base";
+            bindings = <
+                //╭──────────┬──────────┬──────────┬──────────┬──────────╮   ╭──────────┬──────────┬──────────┬──────────┬──────────╮
+                //│  Q       │  W       │  E       │  R       │  T       │   │  Y       │  U       │  I       │  O       │  P       │
+                    &kp Q      &kp W      &kp E      &kp R      &kp T          &kp Y      &kp U      &kp I      &kp O      &kp P
+                //├──────────┼──────────┼──────────┼──────────┼──────────┤   ├──────────┼──────────┼──────────┼──────────┼──────────┤
+                //│  A       │  S       │  D       │  F       │  G       │   │  H       │  J       │  K       │  L       │  '       │
+                    &kp A      &kp S      &kp D      &kp F      &kp G          &kp H      &kp J      &kp K      &kp L      &kp SEMI
+                //├──────────┼──────────┼──────────┼──────────┼──────────┤   ├──────────┼──────────┼──────────┼──────────┼──────────┤
+                //│  Z       │  X       │  C       │  V       │  B       │   │  N       │  M       │  ,       │  .       │  /       │
+                    &kp Z      &kp X      &kp C      &kp V      &kp B          &kp N      &kp M      &kp COMMA  &kp DOT    &kp FSLH
+                //╰──────────┴──────────┴──────────┼──────────┼──────────┤   ├──────────┼──────────┼──────────┴──────────┴──────────╯
+                //                                 │  Tab     │  Enter   │   │  Space   │  Bspc    │
+                                                     &lt 2 TAB  &kp ENTER      &kp SPACE  &lt 1 BSPC
+                //                                 ╰──────────┴──────────╯   ╰──────────┴──────────╯
+            >;
+        };
+        // -------------------------------------- Layer 0 Ends -------------------------------------------------------------------
+
+        // -------------------------------------- Layer 1 Starts -----------------------------------------------------------------
+        // Numbers and high frequency symbols
+        sym_layer {
+            label = "Sym.";
+            bindings = <
+                //╭──────────┬──────────┬──────────┬──────────┬──────────╮   ╭──────────┬──────────┬──────────┬──────────┬──────────╮
+                //│  1       │  2       │  3       │  4       │  5       │   │  6       │  7       │  8       │  9       │  0       │
+                    &kp N1     &kp N2     &kp N3     &kp N4     &kp N5         &kp N6     &kp N7     &kp N8     &kp N9     &kp N0
+                //├──────────┼──────────┼──────────┼──────────┼──────────┤   ├──────────┼──────────┼──────────┼──────────┼──────────┤
+                //│  <       │  %       │  (       │  {       │  [       │   │  =       │  ?       │  '       │  +       │  *       │
+                    &kp LT     &kp PRCNT  &kp LPAR   &kp LBRC   &kp LBKT       &kp EQUAL  &kp QMARK  &kp APOS   &kp PLUS   &kp ASTRK
+                //├──────────┼──────────┼──────────┼──────────┼──────────┤   ├──────────┼──────────┼──────────┼──────────┼──────────┤
+                //│  >       │  $       │  )       │  }       │  ]       │   │  @       │  !       │  "       │  -       │  /       │
+                    &kp GT      &kp DLLR  &kp RPAR   &kp RBRC   &kp RBKT       &kp AT     &kp EXCL   &kp DQT    &kp MINUS  &kp FSLH
+                //╰──────────┴──────────┴──────────┼──────────┼──────────┤   ├──────────┼──────────┼──────────┴──────────┴──────────╯
+                //                                 │  Fnc     │  Sym2    │   │          │          │
+                                                     &mo FNC    &mo SYM2       &trans     &trans
+                //                                 ╰──────────┴──────────╯   ╰──────────┴──────────╯
+            >;
+        };
+        // -------------------------------------- Layer 1 Ends -------------------------------------------------------------------
+
+        // -------------------------------------- Layer 2 Starts -----------------------------------------------------------------
+        // Main modifiers and arrow keys
+        ext_layer {
+            label = "Mods";
+            bindings = <
+                //╭──────────┬──────────┬──────────┬──────────┬──────────╮   ╭──────────┬──────────┬──────────┬──────────┬──────────╮
+                //│  ESC     │          │          │          │          │   │  Page UP │  HOME    │  Up      │  End     │  Caps Lk │
+                    &kp ESC    &trans     &trans     &trans     &trans         &kp PG_UP  &kp HOME   &kp UP     &kp END    &kp CAPS 
+                //├──────────┼──────────┼──────────┼──────────┼──────────┤   ├──────────┼──────────┼──────────┼──────────┼──────────┤
+                //│  LALT    │  LGUI    │  LSHIFT  │  LCTRL   │  RALT    │   │  Page DW │  left    │  down    │  right   │  Delete  │
+                    &sk LALT   &sk LGUI   &sk LSHIFT &sk LCTRL  &kp RALT       &kp PG_DN  &kp LEFT   &kp DOWN   &kp RIGHT  &kp DEL
+                //├──────────┼──────────┼──────────┼──────────┼──────────┤   ├──────────┼──────────┼──────────┼──────────┼──────────┤
+                //│  C-z     │  C-x     │  C-c     │  C-v     │  TAB     │   │  C-Bspc  │  Bscp    │          │          │          │
+                    &kp LC(Z)  &kp LC(X)  &kp LC(C)  &kp LC(V)  &kp TAB        &kp LC(BSPC) &kp BSPC &trans     &trans     &trans 
+                //╰──────────┴──────────┴──────────┼──────────┼──────────┤   ├──────────┼──────────┼──────────┴──────────┴──────────╯
+                //                                 │          │  Sym2    │   │  Enter   │  Fnc    │
+                                                     &trans     &kp LCTRL      &kp ENTER  &mo FNC
+                //                                 ╰──────────┴──────────╯   ╰──────────┴──────────╯
+            >;
+        };
+        // -------------------------------------- Layer 2 Ends -------------------------------------------------------------------
+
+        // -------------------------------------- Layer 3 Starts -----------------------------------------------------------------
+        // Function layer
+        fnc_layer {
+            label = "FRow";
+            bindings = <
+                //╭──────────┬──────────┬──────────┬──────────┬──────────╮   ╭──────────┬──────────┬──────────┬──────────┬──────────╮
+                //│  F1      │  F2      │  F3      │  F4      │  F5      │   │  F6      │  F7      │  F8      │  F9      │  F10     │
+                    &kp F1     &kp F2     &kp F3     &kp F4     &kp F5         &kp F6     &kp F7     &kp F8     &kp F9     &kp F10
+                //├──────────┼──────────┼──────────┼──────────┼──────────┤   ├──────────┼──────────┼──────────┼──────────┼──────────┤
+                //│  LALT    │  LGUI    │  LSHIFT  │  LCTRL   │  RALT    │   │  F11     │  F12     │  PrintS  │          │          │
+                    &sk LALT   &sk LGUI   &sk LSHIFT &sk LCTRL  &kp RALT       &kp F11    &kp F12    &kp PSCRN  &trans     &trans
+                //├──────────┼──────────┼──────────┼──────────┼──────────┤   ├──────────┼──────────┼──────────┼──────────┼──────────┤
+                //│          │          │          │          │          │   │          │          │          │          │          │
+                    &none      &none      &none      &none      &none          &none      &none      &none      &none      &none     
+                //╰──────────┴──────────┴──────────┼──────────┼──────────┤   ├──────────┼──────────┼──────────┴──────────┴──────────╯
+                //                                 │          │          │   │          │          │
+                                                     &none      &none          &none      &none
+                //                                 ╰──────────┴──────────╯   ╰──────────┴──────────╯
+            >;
+        };
+        // -------------------------------------- Layer 3 Ends -------------------------------------------------------------------
+
+        // -------------------------------------- Layer 4 Starts -----------------------------------------------------------------
+        // Symbol layer 2
+        symbols_2_layer {
+            label = "Sym.2";
+            bindings = <
+                //╭──────────┬──────────┬──────────┬──────────┬──────────╮   ╭──────────┬──────────┬──────────┬──────────┬──────────╮
+                //│  ^       │  _       │  #       │          │          │   │  F6      │  F7      │  F8      │  F9      │  F10     │
+                    &kp CARET  &kp UNDER  &kp HASH   &none      &none          &none      &none      &none      &none      &none
+                //├──────────┼──────────┼──────────┼──────────┼──────────┤   ├──────────┼──────────┼──────────┼──────────┼──────────┤
+                //│  `       │  ~       │  \       │  |       │  &       │   │          │          │          │          │          │
+                    &kp GRAVE  &kp TILDE  &kp BSLH   &kp PIPE   &kp AMPS       &none      &none      &none      &none      &none
+                //├──────────┼──────────┼──────────┼──────────┼──────────┤   ├──────────┼──────────┼──────────┼──────────┼──────────┤
+                //│          │          │          │          │          │   │          │          │          │          │          │
+                    &none      &none      &none      &none      &none          &none      &none      &none      &none      &none     
+                //╰──────────┴──────────┴──────────┼──────────┼──────────┤   ├──────────┼──────────┼──────────┴──────────┴──────────╯
+                //                                 │          │          │   │          │          │
+                                                     &none      &none          &none      &none
+                //                                 ╰──────────┴──────────╯   ╰──────────┴──────────╯
+            >;
+        };
+        // -------------------------------------- Layer 4 Ends -------------------------------------------------------------------
+
+        // -------------------------------------- Layer 5 Starts -----------------------------------------------------------------
+        // Used to change the keyboard's settings.
+        settings_layer {
+            label = "Sett.";
+            bindings = <
+                //╭──────────┬──────────┬──────────┬──────────┬──────────╮   ╭──────────┬──────────┬──────────┬──────────┬──────────╮
+                //│          │          │          │          │          │   │          │          │          │          │          │
+                    &bootloader &none     &none     &bt BT_CLR &bt BT_SEL 0   &bt BT_SEL 3 &none    &none      &none       &none
+                //├──────────┼──────────┼──────────┼──────────┼──────────┤   ├──────────┼──────────┼──────────┼──────────┼──────────┤
+                //│          │          │          │          │          │   │          │          │          │          │          │
+                    &none      &none      &none      &none     &bt BT_SEL 1   &bt BT_SEL 4 &none      &none      &none     &none
+                //├──────────┼──────────┼──────────┼──────────┼──────────┤   ├──────────┼──────────┼──────────┼──────────┼──────────┤
+                //│          │          │          │          │          │   │          │          │          │          │          │
+                    &none      &none      &none      &none     &bt BT_SEL 2   &bt BT_SEL 5 &none      &none      &none     &none
+                //╰──────────┴──────────┴──────────┼──────────┼──────────┤   ├──────────┼──────────┼──────────┴──────────┴──────────╯
+                //                                 │          │          │   │          │          │
+                                                     &none      &none          &none      &none
+                //                                 ╰──────────┴──────────╯   ╰──────────┴──────────╯
+            >;
+        };
+        // -------------------------------------- Layer 5 Ends -------------------------------------------------------------------
+    };
+};
