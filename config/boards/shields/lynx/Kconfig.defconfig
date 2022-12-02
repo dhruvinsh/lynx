@@ -1,6 +1,6 @@
 # vim: set ts=4 sw=4:
 
-if SHIELD_CRADIO_LEFT
+if SHIELD_LYNX_LEFT
 
 config ZMK_KEYBOARD_NAME
     default "lynx"
@@ -10,8 +10,9 @@ config ZMK_SPLIT_ROLE_CENTRAL
 
 endif
 
-if SHIELD_CRADIO_LEFT || SHIELD_CRADIO_RIGHT
+if SHIELD_LYNX_LEFT || SHIELD_LYNX_RIGHT
 
 config ZMK_SPLIT
 	default y
+
 endif
