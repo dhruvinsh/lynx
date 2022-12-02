@@ -60,7 +60,7 @@
         };
         // momentary to SETTINGS layer
         combo_settings {
-            timeou-ms = <200>;
+            timeout-ms = <200>;
             // both left thumb keys
             key-positions = <30 31>;
             bindings = <&mo SETTINGS>;
