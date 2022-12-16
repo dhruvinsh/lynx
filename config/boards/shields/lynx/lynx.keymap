@@ -6,12 +6,14 @@
 /*
  * REFERENCE: 
  * List of behaviors
- *     &kp  : key-press
- *     &mt  : mode-tap
- *     &mo  : momentary layer
- *     &lt  : layer-tap
- *     &sk  : sticky key
- *     &tog : toogle layer
+ *     &kp    : key-press
+ *     &mt    : mode-tap
+ *     &mo    : momentary layer
+ *     &lt    : layer-tap
+ *     &sk    : sticky key
+ *     &tog   : toogle layer
+ *     &trans : transparent key
+ *     &none  : none (swallow) key
  */
 
 #include <behaviors.dtsi>
